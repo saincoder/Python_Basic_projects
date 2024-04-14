@@ -11,8 +11,8 @@ while True:
     user_choice = int(input(
         '''
         Game Start
-        CLick 1 for play 
-        CLick 2 for Exit / Close
+        Click 1 for play 
+        Click 2 for Exit / Close
         '''
     ))
     if user_choice == 1:
