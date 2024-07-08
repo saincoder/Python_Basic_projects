@@ -8,7 +8,6 @@ username = 'kancain00@gmail.com'
 password = 'WtM2LKz!XR3Z9s!'
 
 
-#WtM2LKz!XR3Z9s!
 # Obtain an access token
 def get_access_token(api_key, api_secret, redirect_uri, username, password):
     url = 'https://api.dailymotion.com/oauth/token'
@@ -26,26 +25,32 @@ def get_access_token(api_key, api_secret, redirect_uri, username, password):
     return response.json()['access_token']
 
 
-# Upload the video
-def upload_video(access_token, video_file_path, title, description):
-    # Step 1: Get the URL to upload the video
+# Request an upload URL
+def get_upload_url(access_token):
     url = 'https://api.dailymotion.com/file/upload'
     headers = {
         'Authorization': f'Bearer {access_token}'
     }
-    response = requests.post(url, headers=headers)
+    response = requests.get(url, headers=headers)
     response.raise_for_status()
-    upload_url = response.json()['upload_url']
+    return response.json()['upload_url']
 
-    # Step 2: Upload the video file
+
+# Upload the video file
+def upload_video_file(upload_url, video_file_path):
     with open(video_file_path, 'rb') as f:
         files = {'file': f}
         response = requests.post(upload_url, files=files)
         response.raise_for_status()
-        video_url = response.json()['url']
+        return response.json()['url']
 
-    # Step 3: Create the video object on Dailymotion
+
+# Create the video object on Dailymotion
+def create_video_object(access_token, video_url, title, description):
     url = 'https://api.dailymotion.com/me/videos'
+    headers = {
+        'Authorization': f'Bearer {access_token}'
+    }
     data = {
         'url': video_url,
         'title': title,
@@ -59,10 +64,12 @@ def upload_video(access_token, video_file_path, title, description):
 # Main function to execute the script
 def main():
     access_token = get_access_token(api_key, api_secret, redirect_uri, username, password)
-    video_file_path = 'path_to_your_video_file.mp4'
-    title = 'Your Video Title'
+    upload_url = get_upload_url(access_token)
+    video_file_path = r'C:\Users\kanca\PycharmProjects\Python_Basic_projects\video.mp4'
+    video_url = upload_video_file(upload_url, video_file_path)
+    title = 'Islamic Video'
     description = 'Your Video Description'
-    video_info = upload_video(access_token, video_file_path, title, description)
+    video_info = create_video_object(access_token, video_url, title, description)
     print(f'Video uploaded successfully: {video_info}')
 
 
